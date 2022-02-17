@@ -1,0 +1,108 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "kubeEnvironment_name": {
+            "type": "String"
+        },
+        "workspace_id": {
+            "type": "String"
+        },
+        "workspace_sharedKey":{
+            "type": "securestring"
+        },
+        "location": {
+            "type": "String"
+        },
+        "containerApp_name": {
+            "type": "String"
+        },
+        "containerApp_image": {
+            "type": "String"
+        },
+        "containerApp_external": {
+            "type": "Bool"
+        },
+        "containerApp_targetPort": {
+            "type": "String"
+        },
+        "containerApp_cpu": {
+            "type": "String"
+        },
+        "containerApp_memory": {
+            "type": "String"
+        },
+        "containerApp_minReplicas": {
+            "type": "String"
+        },
+        "containerApp_maxReplicas": {
+            "type": "String"
+        },
+        "tags": {
+            "type": "object"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Web/kubeEnvironments",
+            "apiVersion": "2021-02-01",
+            "name": "[parameters('kubeEnvironment_name')]",
+            "location": "[parameters('location')]",
+            "kind": "containerenvironment",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "type": "managed",
+                "appLogsConfiguration": {
+                    "destination": "log-analytics",
+                    "logAnalyticsConfiguration": {
+                        "customerId": "[parameters('workspace_id')]",
+                        "sharedKey": "[parameters('workspace_sharedKey')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/containerApps",
+            "apiVersion": "2021-03-01",
+            "name": "[parameters('containerApp_name')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "kubeEnvironmentId": "[resourceId('Microsoft.Web/kubeEnvironments', parameters('kubeEnvironment_name'))]",
+                "configuration": {
+                "ingress": {
+                    "external": "[parameters('containerApp_external')]",
+                    "targetport": "[parameters('containerApp_targetPort')]",
+                    "allowInsecure": false,
+                    "traffic": [
+                    {
+                    "latestRevision": true,
+                    "weight": 100
+                    }
+                    ]
+                }
+            },
+                "template": {
+                "containers": [
+                            {
+                    "name": "[parameters('containerApp_name')]",
+                    "image": "[parameters('containerApp_image')]",
+                    "resources": {
+                        "cpu": "[parameters('containerApp_cpu')]",
+                        "memory": "[format('{0}Gi', parameters('containerApp_memory'))]"
+                    }
+                    }
+                ],
+                "scale": {
+                    "minReplica": "[parameters('containerApp_minReplicas')]",
+                    "maxReplica": "[parameters('containerApp_maxReplicas')]"
+                }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/kubeEnvironments', parameters('kubeEnvironment_name'))]"
+      ]
+    }   
+    ]
+}

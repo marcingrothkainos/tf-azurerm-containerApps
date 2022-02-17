@@ -1,0 +1,15 @@
+{
+    "kubeEnvironment_name"          : { "value": "${kubeEnvironment_name}" },
+    "location"                      : { "value": "${location}" },
+    "containerApp_name"             : { "value": "${containerApp_name}" },
+    "containerApp_image"            : { "value": "${containerApp_image}" },
+    "containerApp_external"         : { "value": ${containerApp_external} },
+    "containerApp_targetPort"       : { "value": "${containerApp_targetPort}" },
+    "containerApp_cpu"              : { "value": "${containerApp_cpu}" },
+    "containerApp_memory"           : { "value": "${containerApp_memory}" },
+    "containerApp_minReplicas"      : { "value": "${containerApp_minReplicas}" },
+    "containerApp_maxReplicas"      : { "value": "${containerApp_maxReplicas}" },
+    "workspace_id"                  : { "value": "${workspace_id}" },
+    "workspace_sharedKey"           : { "value": "${workspace_sharedKey}"},
+    "tags"                          : { "value": ${tags}}
+}
